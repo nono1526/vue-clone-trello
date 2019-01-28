@@ -2,38 +2,36 @@
   <div id="app">
     <div class="container">
       <v-card>
-        <ul>
-          <span>TO DO LIST</span>
+        <span>TO DO LIST</span>
+        <ul
+          style="height: 100%"
+          @drop="dropInfo(arguments, 'listItemsFirst')"
+        >
           <li
             v-for="(item, idx) in listItemsFirst"
             :key="`${idx} ${item.text}`"
             class="v-info"
             draggable
-            @dragstart="dragInfoStart('listItemsFirst', item)"
-            @drop="dropInfo('listItemsFirst', item)"
-            @dragenter="dragEnter"
-            @dragover="dragOver"
-            @dragleave="dragLeave"
-            data-name="listItemsFirst"
+            @dragstart="dragInfoStart(arguments, 'listItemsFirst', item)"
+            @dragover.prevent
           >
             {{ item.text }}
           </li>
         </ul>
       </v-card>
       <v-card>
-        <ul>
-          <span>CAN I ?</span>
+        <span>CAN I ?</span>
+        <ul
+          style="height: 100%"
+          @drop="dropInfo(arguments, 'listItemsSecond')"
+        >
           <li
             v-for="(item, idx) in listItemsSecond"
             :key="`${idx} ${item.text}`"
             class="v-info"
             draggable
-            @dragstart="dragInfoStart('listItemsSecond', item)"
-            @dragenter="dragEnter"
-            @dragover="dragOver"
-            @dragleave="dragLeave"
-            @drop="dropInfo('listItemsSecond', item)"
-            data-name="listItemsSecond"
+            @dragstart="dragInfoStart(arguments, 'listItemsSecond', item)"
+            @dragover.prevent
           >
             {{ item.text }}
           </li>
@@ -52,22 +50,28 @@ export default {
   },
   data: () => ({
     listItemsFirst: [{
+      id: 1,
       text: 'React',
       labelColor: 'blue'
     }, {
+      id: 2,
       text: 'Vue',
       labelColor: 'green'
     }, {
+      id: 3,
       text: 'angular',
       labelColor: 'red'
     }],
     listItemsSecond: [{
+      id: 4,
       text: 'React',
       labelColor: 'blue'
     }, {
+      id: 5,
       text: 'Vue',
       labelColor: 'green'
     }, {
+      id: 6,
       text: 'angular',
       labelColor: 'red'
     }],
@@ -78,19 +82,20 @@ export default {
     }
   }),
   methods: {
-    dragInfoStart (drapList, dragItem) {
-      console.log(drapList)
-      this.drappingInfo.from = drapList
-      this.drappingInfo.item = dragItem
-      console.log('start!!!')
+    dragInfoStart (args, from, dragItem) {
+      const dragEvent = args[0]
+      dragEvent.dataTransfer.setData('text/plain', `${from},${dragItem.id}`)
+      console.log(dragEvent)
     },
-    dropInfo (dropList, item) {
-      this.drappingInfo.to = dropList
-      const from = this.drappingInfo.from
-      const to = this.drappingInfo.to
-      console.log(this[from])
-      this[from] = this[from].filter(item => item !== this.drappingInfo.item)
-      this[to].push(this.drappingInfo.item)
+    dropInfo (args, to) {
+      const dragEvent = args[0]
+      console.log(dragEvent)
+      const [from, id] = dragEvent.dataTransfer.getData('text').split(',')
+      console.log(this[from], id)
+      const activeItem = this[from].find(item => item.id + '' === id)
+      console.log(activeItem)
+      this[from] = this[from].filter(item => item.id + '' !== id)
+      this[to].push(activeItem)
     },
     // @drop="drop"
     drop (e) {
