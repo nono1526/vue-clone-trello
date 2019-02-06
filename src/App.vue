@@ -6,6 +6,8 @@
         <ul
           style="height: 100%"
           @drop="dropInfo(arguments, 'listItemsFirst')"
+          @dragover.prevent
+
         >
           <li
             v-for="(item, idx) in listItemsFirst"
@@ -13,7 +15,6 @@
             class="v-info"
             draggable
             @dragstart="dragInfoStart(arguments, 'listItemsFirst', item)"
-            @dragover.prevent
           >
             {{ item.text }}
           </li>
@@ -24,6 +25,7 @@
         <ul
           style="height: 100%"
           @drop="dropInfo(arguments, 'listItemsSecond')"
+          @dragover.prevent
         >
           <li
             v-for="(item, idx) in listItemsSecond"
@@ -31,7 +33,6 @@
             class="v-info"
             draggable
             @dragstart="dragInfoStart(arguments, 'listItemsSecond', item)"
-            @dragover.prevent
           >
             {{ item.text }}
           </li>
@@ -89,6 +90,7 @@ export default {
     },
     dropInfo (args, to) {
       const dragEvent = args[0]
+      dragEvent.preventDefault
       console.log(dragEvent)
       const [from, id] = dragEvent.dataTransfer.getData('text').split(',')
       console.log(this[from], id)
