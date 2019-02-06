@@ -14,6 +14,7 @@
             :key="`${idx} ${item.text}`"
             class="v-info"
             draggable
+            :class="{dragging: item.isDragging}"
             @dragstart="dragInfoStart(arguments, 'listItemsFirst', item)"
           >
             {{ item.text }}
@@ -32,6 +33,7 @@
             :key="`${idx} ${item.text}`"
             class="v-info"
             draggable
+            :class="{dragging: item.isDragging}"
             @dragstart="dragInfoStart(arguments, 'listItemsSecond', item)"
           >
             {{ item.text }}
@@ -53,7 +55,8 @@ export default {
     listItemsFirst: [{
       id: 1,
       text: 'React',
-      labelColor: 'blue'
+      labelColor: 'blue',
+      isDragging: false
     }, {
       id: 2,
       text: 'Vue',
@@ -85,19 +88,23 @@ export default {
   methods: {
     dragInfoStart (args, from, dragItem) {
       const dragEvent = args[0]
+      
       dragEvent.dataTransfer.setData('text/plain', `${from},${dragItem.id}`)
+      this.$set(dragItem, 'isDragging', true)
+      console.log(dragItem)
       console.log(dragEvent)
     },
     dropInfo (args, to) {
       const dragEvent = args[0]
       dragEvent.preventDefault
-      console.log(dragEvent)
+      const nodeList = [...dragEvent.path[1].childNodes]
+      const dropNode = dragEvent.path[0]
+      const insertIndex = nodeList.indexOf(dropNode) + 1
       const [from, id] = dragEvent.dataTransfer.getData('text').split(',')
-      console.log(this[from], id)
       const activeItem = this[from].find(item => item.id + '' === id)
-      console.log(activeItem)
+      this.$set(activeItem, 'isDragging', false)
       this[from] = this[from].filter(item => item.id + '' !== id)
-      this[to].push(activeItem)
+      this[to].splice(insertIndex, 0, activeItem)
     },
     // @drop="drop"
     drop (e) {
@@ -145,4 +152,6 @@ export default {
   padding-right 30px
   padding-top 15px
   padding-bottom 15px
+.dragging
+  background-color rgba(#EAEAEA, 0.5)
 </style>
