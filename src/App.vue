@@ -93,7 +93,9 @@ export default {
     dragInfoStart (args, from, dragItem) {
       this.draggingInfo.from = from
       this.draggingInfo.item = dragItem
+      const dragEvent = args[0]
       this.$set(dragItem, 'isDragging', true)
+     
     },
     dropInfo (args, to) {
       this.$set(this.draggingInfo.item, 'isDragging', false)
