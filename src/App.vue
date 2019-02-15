@@ -7,6 +7,7 @@
           style="height: 100%"
           @drop="dropInfo(arguments, 'listItemsFirst')"
           @dragover.prevent
+          @dragenter="dragEnter(arguments, 'listItemsSecond')"
 
         >
           <li
@@ -26,7 +27,9 @@
         <ul
           style="height: 100%"
           @drop="dropInfo(arguments, 'listItemsSecond')"
+          @dragenter="dragEnter(arguments, 'listItemsSecond')"
           @dragover.prevent
+
         >
           <li
             v-for="(item, idx) in listItemsSecond"
@@ -99,7 +102,7 @@ export default {
       dragEvent.preventDefault
       const nodeList = [...dragEvent.path[1].childNodes]
       const dropNode = dragEvent.path[0]
-      const insertIndex = nodeList.indexOf(dropNode) + 1
+      const insertIndex = nodeList.indexOf(dropNode)
       const [from, id] = dragEvent.dataTransfer.getData('text').split(',')
       const activeItem = this[from].find(item => item.id + '' === id)
       this.$set(activeItem, 'isDragging', false)
@@ -110,12 +113,23 @@ export default {
     drop (e) {
       console.log('drop!' + e)
     },
-    dragEnter (e) {
-      console.log('dragEnter!' + e)
+    dragEnter (args, to) {
+      const dragEvent = args[0]
+      const [from, id] = dragEvent.dataTransfer.getData('text').split(',')
+      console.log(from, id)
     },
-    dragOver (e) {
-      e.preventDefault()
-      console.log('dragOver' + e)
+    dragOver (args, to) {
+      const dragEvent = args[0]
+      dragEvent.preventDefault
+      const nodeList = [...dragEvent.path[1].childNodes]
+      const dropNode = dragEvent.path[0]
+      const insertIndex = nodeList.indexOf(dropNode) + 1
+      const [from, id] = dragEvent.dataTransfer.getData('text').split(',')
+      console.log(dropNode)
+      const activeItem = this[from].find(item => item.id + '' === id)
+      this.$set(activeItem, 'isDragging', false)
+      this[from] = this[from].filter(item => item.id + '' !== id)
+      this[to].splice(insertIndex, 0, activeItem)      
     },
     dragLeave (e) {
       console.log('drag leave' + e)
