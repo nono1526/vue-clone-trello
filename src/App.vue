@@ -4,11 +4,11 @@
       <v-card>
         <span>TO DO LIST</span>
         <ul
+          class="card__list"
           style="height: 100%"
           @drop="dropInfo(arguments, 'listItemsFirst')"
           @dragover.prevent
-          @dragenter="dragEnter(arguments, 'listItemsSecond')"
-
+          @dragenter="dragEnter(arguments, 'listItemsFirst')"
         >
           <li
             v-for="(item, idx) in listItemsFirst"
@@ -25,6 +25,7 @@
       <v-card>
         <span>CAN I ?</span>
         <ul
+          class="card__list"
           style="height: 100%"
           @drop="dropInfo(arguments, 'listItemsSecond')"
           @dragenter="dragEnter(arguments, 'listItemsSecond')"
@@ -82,7 +83,7 @@ export default {
       text: 'angular',
       labelColor: 'red'
     }],
-    drappingInfo: {
+    draggingInfo: {
       from: '',
       to: '',
       item: {}
@@ -91,36 +92,42 @@ export default {
   methods: {
     dragInfoStart (args, from, dragItem) {
       const dragEvent = args[0]
-      
-      dragEvent.dataTransfer.setData('text/plain', `${from},${dragItem.id}`)
+      this.draggingInfo.from = from
+      this.draggingInfo.item = dragItem
       this.$set(dragItem, 'isDragging', true)
-      console.log(dragItem)
-      console.log(dragEvent)
     },
     dropInfo (args, to) {
-      const dragEvent = args[0]
-      dragEvent.preventDefault
-      const nodeList = [...dragEvent.path[1].childNodes]
-      const dropNode = dragEvent.path[0]
-      const insertIndex = nodeList.indexOf(dropNode)
-      const [from, id] = dragEvent.dataTransfer.getData('text').split(',')
-      const activeItem = this[from].find(item => item.id + '' === id)
-      this.$set(activeItem, 'isDragging', false)
-      this[from] = this[from].filter(item => item.id + '' !== id)
-      this[to].splice(insertIndex, 0, activeItem)
+      // this.draggingInfo.to = to
+      // const dragEvent = args[0]
+      // dragEvent.preventDefault()
+      // const nodeList = [...dragEvent.path[1].childNodes]
+      // const dropNode = dragEvent.path[0]
+      // const insertIndex = nodeList.indexOf(dropNode)
+      // const { from, item } = this.draggingInfo
+      // this.$set(item, 'isDragging', false)
+      // this[from] = this[from].filter(card => card.id !== item.id)
+      // this[to].splice(insertIndex, 0, item)
     },
     // @drop="drop"
     drop (e) {
       console.log('drop!' + e)
     },
     dragEnter (args, to) {
+      this.draggingInfo.to = to
       const dragEvent = args[0]
-      const [from, id] = dragEvent.dataTransfer.getData('text').split(',')
-      console.log(from, id)
+      if (!dragEvent.target.className.includes('v-info')) return
+      dragEvent.preventDefault()
+      const nodeList = [...dragEvent.path[1].childNodes]
+      const dropNode = dragEvent.path[0]
+      const insertIndex = nodeList.indexOf(dropNode)
+      const { from, item } = this.draggingInfo
+      this.$set(item, 'isDragging', false)
+      this[from] = this[from].filter(card => card.id !== item.id)
+      this[to].splice(insertIndex, 0, item)
     },
     dragOver (args, to) {
       const dragEvent = args[0]
-      dragEvent.preventDefault
+      dragEvent.preventDefault()
       const nodeList = [...dragEvent.path[1].childNodes]
       const dropNode = dragEvent.path[0]
       const insertIndex = nodeList.indexOf(dropNode) + 1
