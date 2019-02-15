@@ -91,28 +91,15 @@ export default {
   }),
   methods: {
     dragInfoStart (args, from, dragItem) {
-      const dragEvent = args[0]
       this.draggingInfo.from = from
       this.draggingInfo.item = dragItem
       this.$set(dragItem, 'isDragging', true)
     },
     dropInfo (args, to) {
-      // this.draggingInfo.to = to
-      // const dragEvent = args[0]
-      // dragEvent.preventDefault()
-      // const nodeList = [...dragEvent.path[1].childNodes]
-      // const dropNode = dragEvent.path[0]
-      // const insertIndex = nodeList.indexOf(dropNode)
-      // const { from, item } = this.draggingInfo
-      // this.$set(item, 'isDragging', false)
-      // this[from] = this[from].filter(card => card.id !== item.id)
-      // this[to].splice(insertIndex, 0, item)
-    },
-    // @drop="drop"
-    drop (e) {
-      console.log('drop!' + e)
+      this.$set(this.draggingInfo.item, 'isDragging', false)
     },
     dragEnter (args, to) {
+      console.log('dragEnter!')
       this.draggingInfo.to = to
       const dragEvent = args[0]
       if (!dragEvent.target.className.includes('v-info')) return
@@ -120,30 +107,11 @@ export default {
       const nodeList = [...dragEvent.path[1].childNodes]
       const dropNode = dragEvent.path[0]
       const insertIndex = nodeList.indexOf(dropNode)
-      const { from, item } = this.draggingInfo
-      this.$set(item, 'isDragging', false)
+      const { item, from } = this.draggingInfo
       this[from] = this[from].filter(card => card.id !== item.id)
       this[to].splice(insertIndex, 0, item)
-    },
-    dragOver (args, to) {
-      const dragEvent = args[0]
-      dragEvent.preventDefault()
-      const nodeList = [...dragEvent.path[1].childNodes]
-      const dropNode = dragEvent.path[0]
-      const insertIndex = nodeList.indexOf(dropNode) + 1
-      const [from, id] = dragEvent.dataTransfer.getData('text').split(',')
-      console.log(dropNode)
-      const activeItem = this[from].find(item => item.id + '' === id)
-      this.$set(activeItem, 'isDragging', false)
-      this[from] = this[from].filter(item => item.id + '' !== id)
-      this[to].splice(insertIndex, 0, activeItem)      
-    },
-    dragLeave (e) {
-      console.log('drag leave' + e)
+      this.draggingInfo.from = to
     }
-    // @dragenter="dragEnter"
-    // @dragover="dragOver"
-    // @dragleave="dragLeave"
   }
 }
 </script>
