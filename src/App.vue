@@ -5,7 +5,6 @@
         <span>TO DO LIST</span>
         <ul
           class="card__list"
-          style="height: 100%"
           @drop="dropInfo(arguments, 'listItemsFirst')"
           @dragover.prevent
           @dragenter="dragEnter(arguments, 'listItemsFirst')"
@@ -21,12 +20,12 @@
             {{ item.text }}
           </li>
         </ul>
+        <a class="add__list" @click="addInfo(arguments, 'listItemsFirst')">+ 新增項目</a>
       </v-card>
       <v-card>
         <span>CAN I ?</span>
         <ul
           class="card__list"
-          style="height: 100%"
           @drop="dropInfo(arguments, 'listItemsSecond')"
           @dragenter="dragEnter(arguments, 'listItemsSecond')"
           @dragover.prevent
@@ -43,6 +42,7 @@
             {{ item.text }}
           </li>
         </ul>
+        <a class="add__list"  @click="addInfo(arguments, 'listItemsSecond')">+ 新增項目</a>
       </v-card>
     </div>
   </div>
@@ -90,12 +90,19 @@ export default {
     }
   }),
   methods: {
+    addInfo (args, name) {
+      const dragEvent = args[0]
+      dragEvent.preventDefault()
+      this[name].push({
+        id: Date.now(),
+        text: 'Hello' + Date.now(),
+        labelColor: 'blue'
+      })
+    },
     dragInfoStart (args, from, dragItem) {
       this.draggingInfo.from = from
       this.draggingInfo.item = dragItem
-      const dragEvent = args[0]
       this.$set(dragItem, 'isDragging', true)
-     
     },
     dropInfo (args, to) {
       this.$set(this.draggingInfo.item, 'isDragging', false)
@@ -145,4 +152,11 @@ export default {
   padding-bottom 15px
 .dragging
   background-color rgba(#EAEAEA, 0.5)
+.add__list
+  padding-top 10px
+  color rgba(#fff, .75)
+  cursor pointer
+  &:hover
+    color rgba(#fff, 0.3)
+
 </style>

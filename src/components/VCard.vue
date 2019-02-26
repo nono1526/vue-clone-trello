@@ -19,5 +19,5 @@ export default {
   border-radius 5px
   margin-left 5px
   margin-right 5px
-
+  height 100%
 </style>
