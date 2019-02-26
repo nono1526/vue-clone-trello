@@ -8,17 +8,20 @@
           @drop="dropInfo(arguments, 'listItemsFirst')"
           @dragover.prevent
           @dragenter="dragEnter(arguments, 'listItemsFirst')"
+
         >
-          <li
+          <info-block
+            @dblclick="item.editable = !item.editable"
             v-for="(item, idx) in listItemsFirst"
             :key="`${idx} ${item.text}`"
-            class="v-info"
+             v-model="item.text"
+            :editable="item.editable"
             draggable
             :class="{dragging: item.isDragging}"
             @dragstart="dragInfoStart(arguments, 'listItemsFirst', item)"
           >
             {{ item.text }}
-          </li>
+          </info-block>
         </ul>
         <a class="add__list" @click="addInfo(arguments, 'listItemsFirst')">+ 新增項目</a>
       </v-card>
@@ -31,16 +34,18 @@
           @dragover.prevent
 
         >
-          <li
+          <info-block
+            @dblclick="item.editable = !item.editable"
             v-for="(item, idx) in listItemsSecond"
             :key="`${idx} ${item.text}`"
-            class="v-info"
+            v-model="item.text"
+            :editable="item.editable"
             draggable
             :class="{dragging: item.isDragging}"
             @dragstart="dragInfoStart(arguments, 'listItemsSecond', item)"
           >
             {{ item.text }}
-          </li>
+          </info-block>
         </ul>
         <a class="add__list"  @click="addInfo(arguments, 'listItemsSecond')">+ 新增項目</a>
       </v-card>
@@ -50,38 +55,47 @@
 
 <script>
 import VCard from '@/components/VCard'
+import InfoBlock from '@/components/InfoBlock.vue'
+console.log(VCard)
 export default {
   name: 'app',
   components: {
-    VCard
+    VCard,
+    InfoBlock
   },
   data: () => ({
     listItemsFirst: [{
       id: 1,
       text: 'React',
       labelColor: 'blue',
-      isDragging: false
+      isDragging: false,
+      editable: false
     }, {
       id: 2,
       text: 'Vue',
-      labelColor: 'green'
+      labelColor: 'green',
+      editable: false
     }, {
       id: 3,
       text: 'angular',
-      labelColor: 'red'
+      labelColor: 'red',
+      editable: false
     }],
     listItemsSecond: [{
       id: 4,
       text: 'React',
-      labelColor: 'blue'
+      labelColor: 'blue',
+      editable: false
     }, {
       id: 5,
       text: 'Vue',
-      labelColor: 'green'
+      labelColor: 'green',
+      editable: false
     }, {
       id: 6,
       text: 'angular',
-      labelColor: 'red'
+      labelColor: 'red',
+      editable: false
     }],
     draggingInfo: {
       from: '',
@@ -96,10 +110,12 @@ export default {
       this[name].push({
         id: Date.now(),
         text: 'Hello' + Date.now(),
-        labelColor: 'blue'
+        labelColor: 'blue',
+        editable: false
       })
     },
     dragInfoStart (args, from, dragItem) {
+      console.log('fk')
       this.draggingInfo.from = from
       this.draggingInfo.item = dragItem
       this.$set(dragItem, 'isDragging', true)
@@ -141,15 +157,7 @@ export default {
   padding-left 50px
   padding-top 30px
   display flex
-.v-info
-  background-color #fff
-  border-radius 5px
-  margin-top 5px
-  margin-bottom 5px
-  padding-left 30px
-  padding-right 30px
-  padding-top 15px
-  padding-bottom 15px
+
 .dragging
   background-color rgba(#EAEAEA, 0.5)
 .add__list
