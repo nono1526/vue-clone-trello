@@ -1,6 +1,7 @@
 {
   "name": "vue-clone-trello",
-  "version": "0.1.0",
+  "description": "Make a trello clone",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
