@@ -8,7 +8,6 @@
           @drop="dropInfo(arguments, 'listItemsFirst')"
           @dragover.prevent
           @dragenter="dragEnter(arguments, 'listItemsFirst')"
-
         >
           <info-block
             @dblclick="item.editable = !item.editable"
@@ -17,8 +16,8 @@
              v-model="item.text"
             :editable="item.editable"
             draggable
-            :class="{dragging: item.isDragging}"
-            @dragstart="dragInfoStart(arguments, 'listItemsFirst', item)"
+            :class="{dragging: item.dragging}"
+            @dragstart="dragInfoStart('listItemsFirst', item)"
           >
             {{ item.text }}
           </info-block>
@@ -40,9 +39,9 @@
             :key="`${idx} ${item.text}`"
             v-model="item.text"
             :editable="item.editable"
+            :class="{dragging: item.dragging}"
             draggable
-            :class="{dragging: item.isDragging}"
-            @dragstart="dragInfoStart(arguments, 'listItemsSecond', item)"
+            @dragstart="dragInfoStart('listItemsSecond', item)"
           >
             {{ item.text }}
           </info-block>
@@ -67,34 +66,33 @@ export default {
     listItemsFirst: [{
       id: 1,
       text: 'React',
-      labelColor: 'blue',
-      isDragging: false,
+      dragging: false,
       editable: false
     }, {
       id: 2,
       text: 'Vue',
-      labelColor: 'green',
+      dragging: false,
       editable: false
     }, {
       id: 3,
       text: 'angular',
-      labelColor: 'red',
+      dragging: false,
       editable: false
     }],
     listItemsSecond: [{
       id: 4,
       text: 'React',
-      labelColor: 'blue',
+      dragging: false,
       editable: false
     }, {
       id: 5,
       text: 'Vue',
-      labelColor: 'green',
+      dragging: false,
       editable: false
     }, {
       id: 6,
       text: 'angular',
-      labelColor: 'red',
+      dragging: false,
       editable: false
     }],
     draggingInfo: {
@@ -109,32 +107,33 @@ export default {
       dragEvent.preventDefault()
       this[name].push({
         id: Date.now(),
-        text: 'Hello' + Date.now(),
+        text: 'dblclick edit',
         labelColor: 'blue',
         editable: false
       })
     },
-    dragInfoStart (args, from, dragItem) {
-      console.log('fk')
+    dragInfoStart (from, dragItem) {
       this.draggingInfo.from = from
       this.draggingInfo.item = dragItem
-      this.$set(dragItem, 'isDragging', true)
+      dragItem.dragging = true
     },
     dropInfo (args, to) {
-      this.$set(this.draggingInfo.item, 'isDragging', false)
+      this.draggingInfo.item.dragging = false
     },
     dragEnter (args, to) {
-      console.log('dragEnter!')
       this.draggingInfo.to = to
-      const dragEvent = args[0]
+      const [dragEvent] = args
       if (!dragEvent.target.className.includes('v-info')) return
       dragEvent.preventDefault()
       const nodeList = [...dragEvent.path[1].childNodes]
       const dropNode = dragEvent.path[0]
+      // 找到目前拖曳所在位置
       const insertIndex = nodeList.indexOf(dropNode)
       const { item, from } = this.draggingInfo
       this[from] = this[from].filter(card => card.id !== item.id)
+      // 插入到所在位置
       this[to].splice(insertIndex, 0, item)
+      // 因為使用者還沒有放開資訊卡，所以需把最後的欄位在紀錄起來！
       this.draggingInfo.from = to
     }
   }
